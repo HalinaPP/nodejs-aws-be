@@ -1,14 +1,30 @@
 'use strict';
+//import data from '../data/mock.json';
+const data = require('../data/mock.json');
 
-module.exports.getProductsList = async event => {
+/*module.exports.getProductsList = async event => {
+ 
+  
   return {
     statusCode: 200,
-    body: 
-    JSON.stringify({
-        productName: "AzulAll",
-        price: '78'
-      }, null, 2),
+    headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Credentials': true,
+      },
+    body: JSON.stringify(  data , null, 2),
   
   };
 
-};
+};*/
+
+module.exports.getProductsList = async event => {
+    return {
+        statusCode: 200,
+        headers: {
+          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Credentials': true,
+        },
+        body: JSON.stringify(data, null, 2)
+      
+      };
+  };
