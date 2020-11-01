@@ -3,17 +3,18 @@ import data from '../data/mock.json';
 
 export const getProductsList = async event => {
 
-  if(!data){
-    return {
-      statusCode: 404,
-      headers: {
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Credentials': true,
-      },
-      body: JSON.stringify({error: "Error: products not found1!"}, null, 2)
-    
-    };
-  }
+  try{
+    if(!data){
+      return {
+        statusCode: 404,
+        headers: {
+          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Credentials': true,
+        },
+        body: JSON.stringify({error: "Error: products not found1!"}, null, 2)
+      
+      };
+    }
 
     return {
         statusCode: 200,
@@ -24,4 +25,14 @@ export const getProductsList = async event => {
         body: JSON.stringify(data, null, 2)
       
       };
+    } catch (e) {
+      return {
+        statusCode: 400,
+        headers: {
+          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Credentials': true,
+        },
+        body: JSON.stringify({error: e}, null, 2),
+      };
+    }
   };
