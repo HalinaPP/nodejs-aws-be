@@ -5,15 +5,7 @@ export const getProductsList = async event => {
 
   try{
     if(!data){
-      return {
-        statusCode: 404,
-        headers: {
-          'Access-Control-Allow-Origin': '*',
-          'Access-Control-Allow-Credentials': true,
-        },
-        body: JSON.stringify({error: "Error: products not found1!"}, null, 2)
-      
-      };
+      throw new Error( 'Error: products not found1!' );
     }
 
     return {
@@ -32,7 +24,7 @@ export const getProductsList = async event => {
           'Access-Control-Allow-Origin': '*',
           'Access-Control-Allow-Credentials': true,
         },
-        body: JSON.stringify({error: e}, null, 2),
+        body: JSON.stringify({error: e.message}, null, 2),
       };
     }
   };

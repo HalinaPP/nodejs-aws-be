@@ -1,7 +1,7 @@
-const { getProductsList }  = require('./handlers/getProductsList');
-const  { getProductsById }  = require('./handlers/getProductsById');
+import { getProductsList } from './handlers/getProductsList';
+import { getProductsById } from './handlers/getProductsById';
 
-module.exports = {
+export {
     getProductsList,
     getProductsById
 }
