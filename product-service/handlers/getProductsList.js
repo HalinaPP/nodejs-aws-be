@@ -1,23 +1,20 @@
 'use strict';
-//import data from '../data/mock.json';
-const data = require('../data/mock.json');
+import data from '../data/mock.json';
 
-/*module.exports.getProductsList = async event => {
- 
-  
-  return {
-    statusCode: 200,
-    headers: {
+export const getProductsList = async event => {
+
+  if(!data){
+    return {
+      statusCode: 404,
+      headers: {
         'Access-Control-Allow-Origin': '*',
         'Access-Control-Allow-Credentials': true,
       },
-    body: JSON.stringify(  data , null, 2),
-  
-  };
+      body: JSON.stringify({error: "Error: products not found1!"}, null, 2)
+    
+    };
+  }
 
-};*/
-
-module.exports.getProductsList = async event => {
     return {
         statusCode: 200,
         headers: {
