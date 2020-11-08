@@ -1,5 +1,4 @@
 const {Client} = require ('pg');
-//const uuid = require ('uuid');
 
 const { PG_HOST, PG_PORT, PG_DATABASE, PG_USERNAME, PG_PASSWORD } = process.env;
 
@@ -27,7 +26,7 @@ selectAll = async event => {
         const { rows } = await client.query(`Select p.*, s.count from products as p LEFT JOIN stocks as s ON  p.id = s.product_id `);
         productsAll = rows;
     } catch (error) {
-        console.error('Error',error);
+        throw new Error('500')
 
     }finally{
         client.end();
@@ -45,7 +44,7 @@ selectById = async id =>{
         const { rows } = await client.query(`Select  p.*, s.count from products as p LEFT JOIN stocks as s ON  s.product_id = p.id  where p.id='${id}'`);
         product = rows[0];
     } catch (error) {
-        console.error('Error',err);
+        throw new Error('500')
 
     }finally{
         client.end();
@@ -58,8 +57,14 @@ addProduct = async productData =>{
     await client.connect();
     let productId;
     console.log('productData=',productData);
+    if( /*!Object.is(productData) || */productData.title === '' 
+            || productData.description === '' || productData.count < 0 || productData.price < 0) {
+            throw new Error('400');
+    }
 
     try{
+        await client.query('BEGIN')
+    
         let { rows } = await client.query(`INSERT INTO products
                                                 (id, title, description, price)
                                             VALUES (uuid_generate_v4(), '${productData.title}', '${productData.description}', ${productData.price} ) RETURNING id`);
@@ -68,15 +73,20 @@ addProduct = async productData =>{
         if(productId) {
             let { rows } = await client.query(` INSERT INTO stocks
                                                 (product_id, count)
-                                            VALUES ('${productId}', ${productData.count}) `);
+                                                VALUES ('${productId}', ${productData.count}) `);
             console.log('st',rows);
        }
+       await client.query('COMMIT')
+  
     } catch (error) {
-        console.error('Error',err);
+        
+        await client.query('ROLLBACK')
+        throw new Error('500');
 
-    }finally{
+    } finally {
         client.end();
     }
+
     return productId;
 }
 
