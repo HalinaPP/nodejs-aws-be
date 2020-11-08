@@ -1,4 +1,4 @@
-const {Client} = require ('pg');
+const { Client } = require ('pg');
 
 const { PG_HOST, PG_PORT, PG_DATABASE, PG_USERNAME, PG_PASSWORD } = process.env;
 
@@ -12,7 +12,6 @@ const dbOptions = {
         rejectUnauthorized: false
     },
     connectionTimeOutMillis: 5000
-
 }
 
 selectAll = async event => {
@@ -36,10 +35,11 @@ selectAll = async event => {
 }
 
 selectById = async id =>{
+    let product;
+    
     const client = new Client(dbOptions);
     await client.connect();
-    let product;
-   
+    
     try{
         const { rows } = await client.query(`Select  p.*, s.count from products as p LEFT JOIN stocks as s ON  s.product_id = p.id  where p.id='${id}'`);
         product = rows[0];
@@ -55,10 +55,11 @@ selectById = async id =>{
 addProduct = async productData =>{
     const client = new Client(dbOptions);
     await client.connect();
+    
     let productId;
-    console.log('productData=',productData);
-    if( /*!Object.is(productData) || */productData.title === '' 
-            || productData.description === '' || productData.count < 0 || productData.price < 0) {
+  
+    if(productData.title === '' || productData.description === '' 
+        || productData.count < 0 || productData.price < 0) {
             throw new Error('400');
     }
 

@@ -1,5 +1,6 @@
 'use strict';
-import { addProduct } from './pg-client';
+import { addProduct } from '../model/pg-client';
+import { accessHeaders } from '../constants/headers';
 
 export const setProduct = async event => {
 
@@ -8,7 +9,6 @@ export const setProduct = async event => {
   ' '+ reqC.protocol+' '+reqC.domainName+' '+ reqC.path+' '+event.body);
 
   try{ 
-    //const productId = await addProduct( JSON.parse(event.body) );
     const productId = await addProduct( JSON.parse(event.body)  );
     console.log('prod=',productId);
     if(!productId){
@@ -17,24 +17,15 @@ export const setProduct = async event => {
     
     return {
       statusCode: 200,
-      headers: {
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Credentials': true,
-      },
+      headers: accessHeaders,
       body: JSON.stringify({id: productId}, null, 2),
-    
     };
   
   } catch(e) {
     return {
       statusCode: 500,
-      headers: {
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Credentials': true,
-      },
+      headers: accessHeaders,
       body: JSON.stringify({error: e.message}, null, 2),
     };
   }
-
-
 };

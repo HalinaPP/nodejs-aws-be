@@ -1,5 +1,6 @@
 'use strict';
-import { selectAll } from './pg-client';
+import { selectAll } from '../model/pg-client';
+import { accessHeaders } from '../constants/headers';
 
 export const getProductsList = async event => {
 
@@ -15,20 +16,14 @@ export const getProductsList = async event => {
  
     return {
         statusCode: 200,
-        headers: {
-          'Access-Control-Allow-Origin': '*',
-          'Access-Control-Allow-Credentials': true,
-        },
+        headers: accessHeaders,
         body: JSON.stringify(products, null, 2)
       
       };
     } catch (e) {
       return {
         statusCode: 500,
-        headers: {
-          'Access-Control-Allow-Origin': '*',
-          'Access-Control-Allow-Credentials': true,
-        },
+        headers: accessHeaders,
         body: JSON.stringify({error: e.message}, null, 2),
       };
     }
