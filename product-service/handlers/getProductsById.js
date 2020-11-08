@@ -3,7 +3,6 @@ import { selectById } from '../model/pg-client';
 import { accessHeaders } from '../constants/headers';
 
 export const getProductsById = async event => {
-  
   const reqC = event.requestContext;
   console.log( reqC.requestTime+' '+reqC.httpMethod+' '+reqC.identity.sourceIp+' '+reqC.identity.userAgent+
   ' '+ reqC.protocol+' '+reqC.domainName+' '+ reqC.path);

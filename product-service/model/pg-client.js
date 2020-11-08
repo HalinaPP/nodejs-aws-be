@@ -55,7 +55,8 @@ selectById = async id =>{
 addProduct = async productData =>{
     const client = new Client(dbOptions);
     await client.connect();
-    
+
+    const { title, description, price, count } = productData;
     let productId;
   
     if(productData.title === '' || productData.description === '' 
@@ -68,14 +69,13 @@ addProduct = async productData =>{
     
         let { rows } = await client.query(`INSERT INTO products
                                                 (id, title, description, price)
-                                            VALUES (uuid_generate_v4(), '${productData.title}', '${productData.description}', ${productData.price} ) RETURNING id`);
-        console.log('row=',rows);
+                                            VALUES (uuid_generate_v4(), '${title}', '${description}', ${price} ) RETURNING id`);
+       
         productId = rows[0].id;
         if(productId) {
             let { rows } = await client.query(` INSERT INTO stocks
                                                 (product_id, count)
                                                 VALUES ('${productId}', ${productData.count}) `);
-            console.log('st',rows);
        }
        await client.query('COMMIT')
   

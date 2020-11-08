@@ -3,7 +3,6 @@ import { selectAll } from '../model/pg-client';
 import { accessHeaders } from '../constants/headers';
 
 export const getProductsList = async event => {
-
   const reqC = event.requestContext;
   console.log( reqC.requestTime+' '+reqC.httpMethod+' '+reqC.identity.sourceIp+' '+reqC.identity.userAgent+
   ' '+ reqC.protocol+' '+reqC.domainName+' '+ reqC.path);
@@ -16,7 +15,7 @@ export const getProductsList = async event => {
  
     return {
         statusCode: 200,
-        headers: accessHeaders,
+        headers: accessHeaders ,
         body: JSON.stringify(products, null, 2)
       
       };
