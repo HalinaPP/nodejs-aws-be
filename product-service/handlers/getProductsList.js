@@ -3,6 +3,10 @@ import { selectAll } from './pg-client';
 
 export const getProductsList = async event => {
 
+  const reqC = event.requestContext;
+  console.log( reqC.requestTime+' '+reqC.httpMethod+' '+reqC.identity.sourceIp+' '+reqC.identity.userAgent+
+  ' '+ reqC.protocol+' '+reqC.domainName+' '+ reqC.path);
+
   const products = await selectAll();
   try{
     if(!products){
@@ -20,7 +24,7 @@ export const getProductsList = async event => {
       };
     } catch (e) {
       return {
-        statusCode: 400,
+        statusCode: 500,
         headers: {
           'Access-Control-Allow-Origin': '*',
           'Access-Control-Allow-Credentials': true,

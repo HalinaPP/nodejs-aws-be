@@ -2,9 +2,13 @@
 import { selectById } from './pg-client';
 
 export const getProductsById = async event => {
+  
+  const reqC = event.requestContext;
+  console.log( reqC.requestTime+' '+reqC.httpMethod+' '+reqC.identity.sourceIp+' '+reqC.identity.userAgent+
+  ' '+ reqC.protocol+' '+reqC.domainName+' '+ reqC.path);
+
   try{ 
-    const productId = event.path ? event.path.split('/')[2] : '';
-   
+    const productId = event.pathParameters.productId;
     const product = await selectById(productId);
   
     if(!product){
@@ -23,7 +27,7 @@ export const getProductsById = async event => {
   
   } catch(e) {
     return {
-      statusCode: 404,
+      statusCode: 500,
       headers: {
         'Access-Control-Allow-Origin': '*',
         'Access-Control-Allow-Credentials': true,

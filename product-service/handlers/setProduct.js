@@ -3,13 +3,16 @@ import { addProduct } from './pg-client';
 
 export const setProduct = async event => {
 
-    console.log('ev=', event.body);
+  const reqC = event.requestContext;
+  console.log( reqC.requestTime+' '+reqC.httpMethod+' '+reqC.identity.sourceIp+' '+reqC.identity.userAgent+
+  ' '+ reqC.protocol+' '+reqC.domainName+' '+ reqC.path+' '+event.body);
+
   try{ 
     //const productId = await addProduct( JSON.parse(event.body) );
     const productId = await addProduct( JSON.parse(event.body)  );
     console.log('prod=',productId);
     if(!productId){
-        throw new Error('500');
+        throw new Error('400');
     }
     
     return {
@@ -24,7 +27,7 @@ export const setProduct = async event => {
   
   } catch(e) {
     return {
-      statusCode: 400,
+      statusCode: 500,
       headers: {
         'Access-Control-Allow-Origin': '*',
         'Access-Control-Allow-Credentials': true,
