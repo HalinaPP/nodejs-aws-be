@@ -7,34 +7,33 @@ const BUCKET = 'import-files-halinapp';
 
 export const importProductsFile = async event => {
   const reqC = event.requestContext;
-  const csvName = event.queryStringParametrs.name;
-console.log('ev=',event.queryStringParametrs);
+  const csvName = event.queryStringParameters.name;
+
   console.log( reqC.requestTime+' '+reqC.httpMethod+' '+reqC.identity.sourceIp+' '+reqC.identity.userAgent+
   ' '+ reqC.protocol+' '+reqC.domainName+' '+ reqC.path);
 
-    const  s3 = new AWS.S3({region: 'eu-west-1', signatureVersion: 'v4' });
-
+    const  s3 = new AWS.S3({region: 'eu-west-1' });/
+    const pathName= 'uploaded/'+csvName;
+    
     const params_sign = {
         Bucket:BUCKET,
-        Key: `uploaded/${csvName}`,
+        Key: pathName,
         Expires: 60,
         ContentType: 'text/csv'
     };
 
-    return new Promice ((resolve,reject) => {
+    return await new Promise((resolve,reject) => {
         s3.getSignedUrl('putObject', params_sign, (error,url) => {
         if(error){
             return reject(error);
             
         }
 
-        return {
+        resolve({
             statusCode: 200,
             headers: accessHeaders,
-            body: url,
-          
-          };
-        
+            body:url
+        })
     });
 });
 }
