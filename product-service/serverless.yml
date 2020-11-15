@@ -1,0 +1,139 @@
+# Welcome to Serverless!
+#
+# This file is the main config file for your service.
+# It's very minimal at this point and uses default values.
+# You can always add more config options for more control.
+# We've included some commented out config examples here.
+# Just uncomment any of them to get that config option.
+#
+# For full config options, check the docs:
+#    docs.serverless.com
+#
+# Happy Coding!
+
+service: product-service
+# app and org for use with dashboard.serverless.com
+#app: your-app-name
+#org: your-org-name
+
+# You can pin your service to only deploy with a specific Serverless version
+# Check out our docs for more details
+frameworkVersion: '2'
+
+provider:
+  name: aws
+  runtime: nodejs12.x
+  stage: dev
+  region: eu-west-1
+
+ 
+
+plugins:
+  - serverless-webpack
+  - serverless-event-body-option
+  - serverless-dotenv-plugin
+  - serverless-reqvalidator-plugin
+  - serverless-aws-documentation
+
+
+custom:
+  webpack:
+    webpackConfig: 'webpack.config.js'
+    includeModules: true
+  documentation:
+    api:
+      info:
+        version: '1.0.0'
+        title: halinapp API
+        description: This is halinapp Store
+      tags:
+        -
+          name: User
+          description: User Management
+    models:
+      - name: setProductRequest
+        contentType: "application/json"
+        schema:
+          type: object
+          required: 
+            - title
+            - description
+            - price
+            - count
+          properties:
+            title:
+              type: string
+            description:
+              type: string
+            price:
+              type: number
+            count:
+              type: number
+      - name: setProductResponse
+        contentType: "application/json"
+        schema:
+          type: object
+          properties:
+            result:
+              type: string
+      - name: 400JsonResponse
+        contentType: "application/json"
+        schema:
+          type: object
+          properties:
+            message:
+              type: string
+            statusCode:
+              type: number
+  commonModelSchemaFragments:
+    MethodResponse400Json:
+      statusCode: '400'
+      responseModels:
+        "application/json": 400JsonResponse
+functions:
+  getProductsList:
+    handler: handler.getProductsList
+    events:
+      - http:
+          path: products
+          method: get
+          cors: true
+  
+  getProductsById:
+    handler: handler.getProductsById
+    events:
+      - http:
+          path: products/{productId} 
+          method: get
+          cors: true
+
+  setProduct:
+    handler: handler.setProduct
+    events:
+      - http:
+          documentation:
+            summary: "Add product"
+            description: "Add new product"
+            tags:
+              - Product
+            requestModels:
+              "application/json": setProductRequest
+          path: products 
+          method: post
+          cors: true
+          reqValidatorName: onlyBody
+          methodResponses:
+              - statusCode: '200'
+                responseModels:
+                  "application/json": setProductResponse
+              - ${self:custom.commonModelSchemaFragments.MethodResponse400Json}
+resources:
+  Resources:
+    onlyBody:  
+      Type: "AWS::ApiGateway::RequestValidator"
+      Properties:
+        Name: 'only-body'
+        RestApiId: 
+          Ref: ApiGatewayRestApi
+        ValidateRequestBody: true
+        ValidateRequestParameters: false
