@@ -12,7 +12,7 @@ export const importProductsFile = async event => {
   console.log( reqC.requestTime+' '+reqC.httpMethod+' '+reqC.identity.sourceIp+' '+reqC.identity.userAgent+
   ' '+ reqC.protocol+' '+reqC.domainName+' '+ reqC.path);
 
-    const  s3 = new AWS.S3({region: 'eu-west-1' });/
+    const  s3 = new AWS.S3({region: 'eu-west-1' });
     const pathName= 'uploaded/'+csvName;
     
     const params_sign = {

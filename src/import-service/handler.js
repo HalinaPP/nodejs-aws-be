@@ -5,6 +5,6 @@ import { filesList } from './handlers/filesList';
 
 export {
     importProductsFile,
-   // importFileParser,
+    importFileParser,
   //  filesList
 }

@@ -1,43 +1,49 @@
 import { accessHeaders } from '../constants/headers';
+import csv from 'csv-parser';
 
 const AWS = require('aws-sdk');
 const BUCKET = 'import-files-halinapp';
-import * as csv from 'csv-parser';
 
-export const importFileParser = async (event) =>{
+export const importFileParser =  ({ Records }) =>{
+    try{
+        const  s3 = new AWS.S3({region: 'eu-west-1'});
+              
+        Records.forEach( async(record)  => {
+            const { key } =  record.s3.object;
+            const params = {
+                Bucket: BUCKET,
+                Key: key
+            };
+                      
+           await s3.getObject(params).createReadStream()
+                .pipe(csv())
+                .on('data', (data) =>  console.log(data) )
+                .on('end',   async () =>  {
+                    const copyKey =  key.replace('uploaded', 'parsed');
+                
+                    console.log('Copy from '+ BUCKET +'/'+key);
 
-    const  s3 = new AWS.S3({region: 'eu-west-1'});
-    
-    const params = {
-        Bucket: BUCKET,
-        Key: 'uploaded/catalogs.csv'
-    };
-    
-    const s3Stream = s3.getObject(params).createReadStream();
+                    await s3.copyObject({
+                        Bucket: BUCKET,
+                        CopySource: `${BUCKET}/${key}`,
+                        Key: copyKey
+                    })
+                    .promise();
 
-    await new Promice((resolve,reject) => {
-        s3Stream.pipe(csv())
-        .on('data', (data) =>  console.log(data) )
-        .on('error', (error) =>  reject(error) )
-        .on('end', () =>  resolve() );
-    
-    });
+                    console.log('Copy to '+ BUCKET +'/'+ copyKey);
 
-    for(let record of event.Records){
-        await s3.copyObject({
-            Bucket: BUCKET,
-            CopySource: BUCKET+'/'+record.s3.object.key,
-            Key: record.s3.object.key.replace('uploaded', 'parsed')
-        }).promise();
+                    await s3.deleteObject({
+                        Bucket: BUCKET,
+                        Key: key
+                    }).promise();
+        
+                    console.log('image '+ key.split('/')[1]+' was parsed ');
+                    
+                });
+        });
+    } catch( err ){
+        console.log('catch=',err);
+    } 
 
-        await s3.deleteObject({
-            Bucket: BUCKET,
-            Key: record.s3.object.key
-        }).promise();
-
-        console.log('image '+record.s3.object.key.split('/')[1]+' was parsed ');
-    }
-    return {statusCode: 202}
-
-
+    return {statusCode: 202};
 }
